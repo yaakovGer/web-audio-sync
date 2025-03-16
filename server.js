@@ -58,6 +58,7 @@ wss.on('connection', ws => {
         }
     });
 });
+app.use(express.static(path.join(__dirname))); // Раздаём index.html
 
 server.listen(8080, () => {
     console.log('Сервер запущен на порту 8080');
