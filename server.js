@@ -10,7 +10,7 @@ const wss = new WebSocket.Server({ server });
 
 const audioFilePath = path.join(__dirname, 'audio.mp3');
 
-app.use(express.static(path.join(__dirname))); // Раздаём index.html
+app.use(express.static(__dirname)); // Раздаём index.html
 
 // Потоковая раздача аудиофайла
 app.get('/audio', (req, res) => {
@@ -61,6 +61,10 @@ wss.on('connection', ws => {
                 }
             });
         }
+    });
+
+    ws.on('close', () => {
+        console.log('Клиент отключился');
     });
 });
 
