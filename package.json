@@ -1,0 +1,13 @@
+{
+  "name": "web-audio-sync",
+  "version": "1.0.0",
+  "description": "Синхронное воспроизведение MP3 на нескольких устройствах",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.11.0"
+  }
+}
