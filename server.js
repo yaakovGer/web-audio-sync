@@ -65,7 +65,7 @@ server.listen(8080, () => {
 
 // === Клиентская часть (HTML + JavaScript) ===
 const socket = new WebSocket('wss://web-audio-sync.onrender.com');
-let audio = new Audio('/audio');
+
 audio.loop = true; // Включаем зацикливание
 
 document.body.innerHTML = `
