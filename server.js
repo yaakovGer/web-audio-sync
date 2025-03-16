@@ -66,4 +66,4 @@ server.listen(8080, () => {
 // === Клиентская часть (HTML + JavaScript) ===
 const socket = new WebSocket('wss://web-audio-sync.onrender.com');
 
-document.getElementById('audioPlayer').loop = true;
+
