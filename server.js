@@ -66,34 +66,4 @@ server.listen(8080, () => {
 // === Клиентская часть (HTML + JavaScript) ===
 const socket = new WebSocket('wss://web-audio-sync.onrender.com');
 
-audio.loop = true; // Включаем зацикливание
-
-document.body.innerHTML = `
-    <div style="text-align: center; padding: 20px;">
-        <h1>Синхронизированное Воспроизведение</h1>
-        <audio id="audioPlayer" controls style="display: none;"></audio>
-        <button id="playButton" style="padding: 10px 20px; font-size: 18px;">Старт</button>
-        <button id="pauseButton" style="padding: 10px 20px; font-size: 18px;">Пауза</button>
-        <p id="status">Ожидание...</p>
-    </div>
-`;
-
-document.getElementById('audioPlayer').src = '/audio';
-document.getElementById('playButton').addEventListener('click', () => {
-    socket.send('sync');
-});
-
-document.getElementById('pauseButton').addEventListener('click', () => {
-    socket.send('pause');
-});
-
-socket.onmessage = (event) => {
-    if (event.data === 'play') {
-        audio.currentTime = 0;
-        audio.play();
-        document.getElementById('status').innerText = 'Воспроизведение';
-    } else if (event.data === 'pause') {
-        audio.pause();
-        document.getElementById('status').innerText = 'Пауза';
-    }
-};
+document.getElementById('audioPlayer').loop = true;
