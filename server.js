@@ -1,20 +1,34 @@
-// Серверная часть (Node.js + WebSocket)
+// === Серверная часть (Node.js + Express + WebSocket) ===
+const fs = require('fs');
+const path = require('path');
 const WebSocket = require('ws');
-const server = new WebSocket.Server({ port: 8080 });
+const express = require('express');
+const app = express();
+const server = require('http').createServer(app);
+const wss = new WebSocket.Server({ server });
 
-server.on('connection', ws => {
+const audioFilePath = path.join(__dirname, 'audio.mp3');
+
+// Раздача аудиофайла клиентам
+app.get('/audio', (req, res) => {
+    res.setHeader('Content-Type', 'audio/mpeg');
+    const readStream = fs.createReadStream(audioFilePath);
+    readStream.pipe(res);
+});
+
+wss.on('connection', ws => {
     console.log('Клиент подключился');
     ws.on('message', message => {
         if (message === 'sync') {
             console.log('Синхронизация воспроизведения');
-            server.clients.forEach(client => {
+            wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send('play');
                 }
             });
         } else if (message === 'pause') {
             console.log('Пауза воспроизведения');
-            server.clients.forEach(client => {
+            wss.clients.forEach(client => {
                 if (client.readyState === WebSocket.OPEN) {
                     client.send('pause');
                 }
@@ -23,5 +37,6 @@ server.on('connection', ws => {
     });
 });
 
-console.log('WebSocket сервер запущен на порту 8080');
-
+server.listen(8080, () => {
+    console.log('Сервер запущен на порту 8080');
+});
