@@ -1,25 +1,28 @@
-// === Серверная часть (Node.js + Express + WebSocket) ===
-const fs = require('fs');
-const path = require('path');
-const WebSocket = require('ws');
 const express = require('express');
+const path = require('path');
+const http = require('http');
+const WebSocket = require('ws');
+const fs = require('fs');
+
 const app = express();
-const server = require('http').createServer(app);
+const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
 const audioFilePath = path.join(__dirname, 'audio.mp3');
 
-// Улучшенная потоковая раздача аудиофайла
+app.use(express.static(path.join(__dirname))); // Раздаём index.html
+
+// Потоковая раздача аудиофайла
 app.get('/audio', (req, res) => {
     const stat = fs.statSync(audioFilePath);
     const fileSize = stat.size;
     const range = req.headers.range;
-    
+
     if (range) {
         const parts = range.replace(/bytes=/, '').split('-');
         const start = parseInt(parts[0], 10);
         const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-        
+
         const chunksize = (end - start) + 1;
         const file = fs.createReadStream(audioFilePath, { start, end });
         res.writeHead(206, {
@@ -38,8 +41,10 @@ app.get('/audio', (req, res) => {
     }
 });
 
+// WebSocket сервер для синхронизации
 wss.on('connection', ws => {
     console.log('Клиент подключился');
+    
     ws.on('message', message => {
         if (message === 'sync') {
             console.log('Синхронизация воспроизведения');
@@ -58,13 +63,8 @@ wss.on('connection', ws => {
         }
     });
 });
-app.use(express.static(path.join(__dirname))); // Раздаём index.html
 
-server.listen(8080, () => {
-    console.log('Сервер запущен на порту 8080');
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+    console.log(`Сервер запущен на порту ${PORT}`);
 });
-
-// === Клиентская часть (HTML + JavaScript) ===
-const socket = new WebSocket('wss://web-audio-sync.onrender.com');
-
-
